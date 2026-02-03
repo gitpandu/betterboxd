@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: betterboxd-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - sqlite-data:/app/data
+    environment:
+      - PORT=3001
+    restart: unless-stopped
+    networks:
+      - betterboxd-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+        - VITE_TMDB_API_KEY=${VITE_TMDB_API_KEY}
+    container_name: betterboxd-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - betterboxd-network
+
+volumes:
+  sqlite-data:
+    driver: local
+
+networks:
+  betterboxd-network:
+    driver: bridge
