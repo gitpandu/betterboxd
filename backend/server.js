@@ -125,7 +125,7 @@ app.put('/api/reviews/:id', (req, res) => {
     }
 });
 
-// Delete review
+// Delete review (soft delete)
 app.delete('/api/reviews/:id', (req, res) => {
     try {
         const { id } = req.params;
@@ -136,11 +136,46 @@ app.delete('/api/reviews/:id', (req, res) => {
             return res.status(404).json({ error: 'Review not found' });
         }
 
-        statements.delete.run(id);
+        // Soft delete: mark as deleted instead of removing
+        statements.softDelete.run(id);
+        console.log(`[Server] Soft-deleted review: ${id}`);
         res.status(204).send();
     } catch (error) {
         console.error('Error deleting review:', error);
         res.status(500).json({ error: 'Failed to delete review' });
+    }
+});
+
+// Restore a soft-deleted review
+app.put('/api/reviews/:id/restore', (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Try to restore - this will work even if the review was soft-deleted
+        const result = statements.restore.run(id);
+        if (result.changes === 0) {
+            return res.status(404).json({ error: 'Review not found or not deleted' });
+        }
+
+        // Fetch and return the restored review
+        const restored = statements.getById.get(id);
+        console.log(`[Server] Restored review: ${id}`);
+        res.json(rowToReview(restored));
+    } catch (error) {
+        console.error('Error restoring review:', error);
+        res.status(500).json({ error: 'Failed to restore review' });
+    }
+});
+
+// Get all deleted reviews (for recovery)
+app.get('/api/reviews/deleted', (req, res) => {
+    try {
+        const rows = statements.getDeleted.all();
+        const reviews = rows.map(rowToReview);
+        res.json(reviews);
+    } catch (error) {
+        console.error('Error fetching deleted reviews:', error);
+        res.status(500).json({ error: 'Failed to fetch deleted reviews' });
     }
 });
 

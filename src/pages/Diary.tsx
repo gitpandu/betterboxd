@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import DiaryList from '../components/DiaryList';
 import MovieModal from '../components/MovieModal';
 import ReviewDetailModal from '../components/ReviewDetailModal';
+import ConfirmDialog from '../components/ConfirmDialog';
 import type { Review } from '../types';
 import FilterBar from '../components/FilterBar';
 import type { SortOption, FilterOption } from '../components/FilterBar';
@@ -14,6 +15,10 @@ export default function Diary() {
     const [editingReview, setEditingReview] = useState<Review | null>(null);
     const [viewingReview, setViewingReview] = useState<Review | null>(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+    // Confirmation dialog state
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
 
     const handleOpenAddModal = () => {
         setEditingReview(null);
@@ -40,22 +45,42 @@ export default function Diary() {
         setViewingReview(null);
     };
 
-    const handleDeleteReview = async (id: string) => {
-        console.log(`[Diary] Delete triggered for id: ${id}`);
-
-        // Close modals immediately for responsiveness
+    // Request delete confirmation
+    const handleRequestDelete = (id: string) => {
+        console.log(`[Diary] Delete requested for id: ${id}`);
+        // Close any open modals first
         setIsModalOpen(false);
         setIsViewModalOpen(false);
         setEditingReview(null);
         setViewingReview(null);
+        // Open confirmation dialog
+        setReviewToDelete(id);
+        setIsConfirmOpen(true);
+    };
+
+    // Execute the delete after confirmation
+    const handleConfirmDelete = async () => {
+        if (!reviewToDelete) return;
+
+        console.log(`[Diary] Delete confirmed for id: ${reviewToDelete}`);
+        setIsConfirmOpen(false);
 
         try {
-            await deleteReview(id);
-            console.log(`[Diary] Delete operation completed for id: ${id}`);
+            await deleteReview(reviewToDelete);
+            console.log(`[Diary] Delete operation completed for id: ${reviewToDelete}`);
         } catch (err) {
-            console.error(`[Diary] Delete operation failed for id: ${id}:`, err);
+            console.error(`[Diary] Delete operation failed for id: ${reviewToDelete}:`, err);
             alert('Failed to delete review. Please try again.');
+        } finally {
+            setReviewToDelete(null);
         }
+    };
+
+    // Cancel the delete
+    const handleCancelDelete = () => {
+        console.log(`[Diary] Delete cancelled for id: ${reviewToDelete}`);
+        setIsConfirmOpen(false);
+        setReviewToDelete(null);
     };
 
 
@@ -158,7 +183,7 @@ export default function Diary() {
                 onClose={handleCloseModal}
                 onAddReview={addReview}
                 onUpdateReview={updateReview}
-                onDeleteReview={handleDeleteReview}
+                onDeleteReview={handleRequestDelete}
                 initialReview={editingReview}
             />
 
@@ -166,8 +191,19 @@ export default function Diary() {
                 isOpen={isViewModalOpen}
                 onClose={handleCloseViewModal}
                 onEdit={handleOpenEditModal}
-                onDelete={(review) => handleDeleteReview(review.id)}
+                onDelete={(review) => handleRequestDelete(review.id)}
                 review={viewingReview}
+            />
+
+            <ConfirmDialog
+                isOpen={isConfirmOpen}
+                title="Delete Review"
+                message="Are you sure you want to delete this review? You can recover it later if needed."
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                danger={true}
             />
         </div>
     );
