@@ -45,9 +45,9 @@ export default function ReviewDetailModal({ isOpen, onClose, onEdit, onDelete, r
         }}>
             <div style={{
                 background: 'var(--color-bg)',
-                width: '100%',
-                maxWidth: '500px',
-                maxHeight: '90vh',
+                width: '95vw',
+                maxWidth: '1000px',
+                maxHeight: '95vh',
                 borderRadius: 'var(--border-radius)',
                 display: 'flex',
                 flexDirection: 'column',

@@ -125,9 +125,9 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
         }}>
             <div style={{
                 background: 'var(--color-bg)',
-                width: '100%',
-                maxWidth: '500px',
-                maxHeight: '90vh',
+                width: '95vw',
+                maxWidth: '1000px',
+                maxHeight: '95vh',
                 borderRadius: 'var(--border-radius)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -311,7 +311,7 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
                                         placeholder="Write a review..."
                                         value={reviewText}
                                         onChange={(e) => setReviewText(e.target.value)}
-                                        rows={5}
+                                        rows={15}
                                         style={{
                                             width: '100%',
                                             background: 'var(--color-bg-input)',
