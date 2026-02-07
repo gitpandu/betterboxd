@@ -127,7 +127,7 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
                 background: 'var(--color-bg)',
                 width: '100%',
                 maxWidth: '600px',
-                maxHeight: '100dvh',
+                height: '100dvh',
                 borderRadius: '0',
                 display: 'flex',
                 flexDirection: 'column',

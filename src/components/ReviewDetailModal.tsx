@@ -47,7 +47,7 @@ export default function ReviewDetailModal({ isOpen, onClose, onEdit, onDelete, r
                 background: 'var(--color-bg)',
                 width: '100%',
                 maxWidth: '600px',
-                maxHeight: '100dvh',
+                height: '100dvh',
                 borderRadius: '0',
                 display: 'flex',
                 flexDirection: 'column',
