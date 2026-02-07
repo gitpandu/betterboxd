@@ -125,10 +125,10 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
         }}>
             <div style={{
                 background: 'var(--color-bg)',
-                width: '95vw',
-                maxWidth: '1000px',
-                maxHeight: '95vh',
-                borderRadius: 'var(--border-radius)',
+                width: '100%',
+                maxWidth: '600px',
+                maxHeight: '100dvh',
+                borderRadius: '0',
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
