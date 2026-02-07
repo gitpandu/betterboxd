@@ -49,13 +49,11 @@ A self-hosted movie diary app. Track movies you've watched, rate them, and write
 | Service  | Port |
 |----------|------|
 | Frontend | 8080 |
-| Backend  | 3001 |
+| Backend  | 3000 |
 
 ## Configuration
 
 Edit `docker-compose.yml` to change ports or other settings.
-
-For remote servers, update `VITE_API_URL` in your `.env` to point to your server's backend URL.
 
 ## License
 

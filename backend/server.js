@@ -18,14 +18,14 @@ try {
 }
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: Date.now() });
 });
 
@@ -190,6 +190,6 @@ app.use((err, req, res, next) => {
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Backend server running on port ${PORT}`);
-    console.log(`Health check: http://localhost:${PORT}/health`);
+    console.log(`Health check: http://localhost:${PORT}/api/health`);
     console.log(`API endpoint: http://localhost:${PORT}/api/reviews`);
 });

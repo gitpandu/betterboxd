@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Database file will be stored in a data directory
-const dbPath = join(__dirname, 'data', 'reviews.db');
+const dbPath = join(__dirname, 'data', 'betterboxd.db');
 
 // Initialize database
 const db = new Database(dbPath);

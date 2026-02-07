@@ -13,9 +13,7 @@ RUN npm install
 COPY . .
 
 # Pass build arguments
-ARG VITE_API_URL
 ARG VITE_TMDB_API_KEY
-ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_TMDB_API_KEY=$VITE_TMDB_API_KEY
 
 # Build the application

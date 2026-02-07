@@ -1,10 +1,8 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
 import type { Review } from '../types';
 
 // Fetch all reviews
 export async function getAllReviews(): Promise<Review[]> {
-    const response = await fetch(`${API_BASE_URL}/api/reviews`);
+    const response = await fetch(`/api/reviews`);
     if (!response.ok) {
         throw new Error('Failed to fetch reviews');
     }
@@ -13,7 +11,7 @@ export async function getAllReviews(): Promise<Review[]> {
 
 // Get single review by ID
 export async function getReviewById(id: string): Promise<Review> {
-    const response = await fetch(`${API_BASE_URL}/api/reviews/${id}`);
+    const response = await fetch(`/api/reviews/${id}`);
     if (!response.ok) {
         throw new Error('Failed to fetch review');
     }
@@ -22,7 +20,7 @@ export async function getReviewById(id: string): Promise<Review> {
 
 // Create new review
 export async function createReview(review: Omit<Review, 'id' | 'createdAt'>): Promise<Review> {
-    const response = await fetch(`${API_BASE_URL}/api/reviews`, {
+    const response = await fetch(`/api/reviews`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -39,7 +37,7 @@ export async function createReview(review: Omit<Review, 'id' | 'createdAt'>): Pr
 
 // Update existing review
 export async function updateReview(id: string, updates: Partial<Review>): Promise<Review> {
-    const response = await fetch(`${API_BASE_URL}/api/reviews/${id}`, {
+    const response = await fetch(`/api/reviews/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -56,7 +54,7 @@ export async function updateReview(id: string, updates: Partial<Review>): Promis
 
 // Delete review
 export async function deleteReview(id: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/api/reviews/${id}`, {
+    const response = await fetch(`/api/reviews/${id}`, {
         method: 'DELETE',
     });
 

@@ -24,12 +24,6 @@ Edit the `.env` file and add your TMDB API key:
 VITE_TMDB_API_KEY=your_actual_tmdb_api_key_here
 ```
 
-If you're deploying to a remote server, also set the backend API URL:
-
-```env
-VITE_API_URL=http://your-server-ip:3001
-```
-
 ### 2. Build and Start the Containers
 
 ```bash
@@ -44,14 +38,14 @@ This command will:
 ### 3. Access the Application
 
 - **Frontend**: Open your browser and navigate to `http://localhost:8080` (or `http://your-server-ip:8080`)
-- **Backend API**: Available at `http://localhost:3001` (or `http://your-server-ip:3001`)
+- **Backend API**: Available at `http://localhost:3000` (or `http://your-server-ip:3000`)
 
 ## Port Configuration
 
 The application uses the following ports:
 
 - **Frontend**: `8080` (configurable in `docker-compose.yml`)
-- **Backend**: `3001` (configurable in `docker-compose.yml`)
+- **Backend**: `3000` (configurable in `docker-compose.yml`)
 
 To change ports, edit the `docker-compose.yml` file:
 
@@ -59,14 +53,12 @@ To change ports, edit the `docker-compose.yml` file:
 services:
   frontend:
     ports:
-      - "YOUR_PORT:80"  # Change YOUR_PORT to desired port
+      - "8080:80"
   
   backend:
     ports:
-      - "YOUR_PORT:3001"  # Change YOUR_PORT to desired port
+      - "3000:3000"
 ```
-
-**Important**: If you change the backend port, also update `VITE_API_URL` in your `.env` file.
 
 ## Managing the Application
 
@@ -103,23 +95,23 @@ docker compose up -d --build
 
 ## Data Persistence
 
-The SQLite database is stored in a Docker volume named `sqlite-data`. This ensures your movie reviews persist even when containers are stopped or removed.
+The SQLite database is stored in a Docker volume named `betterboxd-data`. This ensures your movie reviews persist even when containers are stopped or removed.
 
 ### Backup Your Data
 
 ```bash
 # Find the volume location
-docker volume inspect betterboxd_sqlite-data
+docker volume inspect betterboxd-data
 
 # Copy the database file
-docker cp betterboxd-backend:/app/data/reviews.db ./backup-reviews.db
+docker cp betterboxd-backend:/app/data/betterboxd.db ./backup-betterboxd.db
 ```
 
 ### Restore Data
 
 ```bash
 # Copy backup to container
-docker cp ./backup-reviews.db betterboxd-backend:/app/data/reviews.db
+docker cp ./backup-betterboxd.db betterboxd-backend:/app/data/betterboxd.db
 
 # Restart backend
 docker compose restart backend
@@ -134,27 +126,24 @@ docker compose restart backend
    docker compose ps
    ```
 
-2. Verify the `VITE_API_URL` in your `.env` file matches your backend URL
-
-3. Check backend logs:
+2. Check backend logs:
    ```bash
    docker compose logs backend
    ```
 
 ### Port already in use
 
-If ports 8080 or 3001 are already in use:
+If ports 8080 or 3000 are already in use:
 
 1. Edit `docker-compose.yml` to use different ports
-2. Update `VITE_API_URL` in `.env` if you changed the backend port
-3. Rebuild: `docker compose up -d --build`
+2. Rebuild: `docker compose up -d --build`
 
 ### Database not persisting
 
 Ensure the volume is properly created:
 
 ```bash
-docker volume ls | grep sqlite-data
+docker volume ls | grep betterboxd-data
 ```
 
 If missing, recreate it:
@@ -170,7 +159,7 @@ docker compose up -d
 
 Recommended security measures:
 
-1. **Firewall**: Use a firewall to restrict access to ports 8080 and 3001
+1. **Firewall**: Use a firewall to restrict access to ports 8080 and 3000
 2. **VPN**: Access the application through a VPN
 3. **Reverse Proxy**: Use a reverse proxy (like Nginx Proxy Manager or Traefik) with authentication
 4. **Network Isolation**: Keep the application on a private network
@@ -197,7 +186,7 @@ To completely remove the application and its data:
 docker compose down
 
 # Remove volume (WARNING: This deletes all your reviews!)
-docker volume rm betterboxd_sqlite-data
+docker volume rm betterboxd-data
 
 # Remove images
 docker rmi betterboxd-frontend betterboxd-backend
