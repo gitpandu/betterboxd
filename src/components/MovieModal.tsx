@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { X, Search, Star, Heart, Trash2 } from 'lucide-react';
-import { searchMovies, getMovieDirector } from '../services/tmdb';
+import { X, Search, Star, Heart, Trash2, Eye } from 'lucide-react';
+import { searchMovies, getMovieCredits } from '../services/tmdb';
 import type { Movie, Review } from '../types';
 
 interface MovieModalProps {
@@ -21,7 +21,8 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
         title: initialReview.movieTitle,
         posterPath: initialReview.posterPath,
         releaseDate: initialReview.releaseDate || '',
-        director: initialReview.director
+        director: initialReview.director,
+        cast: initialReview.cast
     } : null);
 
     // Review State
@@ -38,7 +39,8 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
                 title: initialReview.movieTitle,
                 posterPath: initialReview.posterPath,
                 releaseDate: initialReview.releaseDate || '',
-                director: initialReview.director
+                director: initialReview.director,
+                cast: initialReview.cast
             });
             setRating(initialReview.rating);
             setLiked(initialReview.liked);
@@ -68,8 +70,8 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
     }, [query]);
 
     const handleSelectMovie = async (movie: Movie) => {
-        const director = await getMovieDirector(movie.id);
-        setSelectedMovie({ ...movie, director });
+        const { director, cast } = await getMovieCredits(movie.id);
+        setSelectedMovie({ ...movie, director, cast });
         setStep('review');
     };
 
@@ -82,6 +84,7 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
             posterPath: selectedMovie.posterPath,
             releaseDate: selectedMovie.releaseDate,
             director: selectedMovie.director,
+            cast: selectedMovie.cast,
             rating,
             liked,
             reviewText,
@@ -149,7 +152,7 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
                 </div>
 
                 {/* Content */}
-                <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
+                <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
 
                     {step === 'search' ? (
                         <>
@@ -210,27 +213,37 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
                         </>
                     ) : (
                         selectedMovie && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
                                 <div style={{ display: 'flex', gap: '1rem' }}>
                                     <div style={{ width: '70px', height: '105px', background: '#333', flexShrink: 0 }}>
                                         {selectedMovie.posterPath && <img src={`https://image.tmdb.org/t/p/w200${selectedMovie.posterPath}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                     </div>
                                     <div>
                                         <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>{selectedMovie.title}</h3>
-                                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', display: 'flex', gap: '8px' }}>
-                                            <span>{selectedMovie.releaseDate ? selectedMovie.releaseDate.split('-')[0] : 'Year Unknown'}</span>
-                                            {selectedMovie.director && (
-                                                <>
-                                                    <span style={{ opacity: 0.5 }}>|</span>
-                                                    <span>Dir. {selectedMovie.director}</span>
-                                                </>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', display: 'flex', gap: '8px' }}>
+                                                <span>{selectedMovie.releaseDate ? selectedMovie.releaseDate.split('-')[0] : 'Year Unknown'}</span>
+                                                {selectedMovie.director && (
+                                                    <>
+                                                        <span style={{ opacity: 0.5 }}>|</span>
+                                                        <span>Dir. {selectedMovie.director}</span>
+                                                    </>
+                                                )}
+                                            </p>
+                                            {selectedMovie.cast && (
+                                                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', opacity: 0.8 }}>
+                                                    Cast: {selectedMovie.cast}
+                                                </p>
                                             )}
-                                        </p>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Specify Date</label>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                        <Eye size={16} />
+                                        Specify Date
+                                    </label>
                                     <input
                                         type="date"
                                         value={watchedDate}
@@ -306,75 +319,87 @@ export default function MovieModal({ isOpen, onClose, onAddReview, onUpdateRevie
                                     </div>
                                 </div>
 
-                                <div>
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                                     <textarea
                                         placeholder="Write a review..."
                                         value={reviewText}
                                         onChange={(e) => setReviewText(e.target.value)}
-                                        rows={15}
                                         style={{
                                             width: '100%',
+                                            height: '100%',
+                                            minHeight: '200px',
                                             background: 'var(--color-bg-input)',
                                             border: 'none',
                                             color: 'white',
                                             padding: '1rem',
                                             borderRadius: '4px',
-                                            resize: 'none'
+                                            resize: 'none',
+                                            flex: 1
                                         }}
                                     />
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '1rem' }}>
-                                    {initialReview && (
-                                        <button
-                                            onClick={() => onDeleteReview && onDeleteReview(initialReview.id)}
-                                            style={{
-                                                background: 'rgba(255, 255, 255, 0.05)',
-                                                color: 'var(--color-text-muted)',
-                                                padding: '1rem',
-                                                borderRadius: '4px',
-                                                fontWeight: 600,
-                                                fontSize: '0.9rem',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '8px',
-                                                border: '1px solid var(--color-border)'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.background = 'rgba(235, 87, 87, 0.1)';
-                                                e.currentTarget.style.color = '#eb5757';
-                                                e.currentTarget.style.borderColor = '#eb5757';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                                                e.currentTarget.style.color = 'var(--color-text-muted)';
-                                                e.currentTarget.style.borderColor = 'var(--color-border)';
-                                            }}
-                                        >
-                                            <Trash2 size={18} />
-                                            Delete
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={handleSubmit}
-                                        style={{
-                                            flex: 1,
-                                            background: 'var(--color-accent-green)',
-                                            color: '#050709',
-                                            padding: '1rem',
-                                            borderRadius: '4px',
-                                            fontWeight: 700,
-                                            fontSize: '1rem'
-                                        }}
-                                    >
-                                        Save
-                                    </button>
-                                </div>
                             </div>
                         )
                     )}
                 </div>
+
+                {/* Footer Actions */}
+                {selectedMovie && step === 'review' && (
+                    <div style={{
+                        padding: '1rem',
+                        borderTop: '1px solid var(--color-border)',
+                        display: 'flex',
+                        gap: '1rem',
+                        background: 'var(--color-bg)'
+                    }}>
+                        {initialReview && (
+                            <button
+                                onClick={() => onDeleteReview && onDeleteReview(initialReview.id)}
+                                style={{
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    color: 'var(--color-text-muted)',
+                                    padding: '1rem',
+                                    borderRadius: '4px',
+                                    fontWeight: 600,
+                                    fontSize: '0.9rem',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    border: '1px solid var(--color-border)'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'rgba(235, 87, 87, 0.1)';
+                                    e.currentTarget.style.color = '#eb5757';
+                                    e.currentTarget.style.borderColor = '#eb5757';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                                    e.currentTarget.style.color = 'var(--color-text-muted)';
+                                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                                }}
+                            >
+                                <Trash2 size={18} />
+                                Delete
+                            </button>
+                        )}
+                        <button
+                            onClick={handleSubmit}
+                            style={{
+                                flex: 1,
+                                background: 'var(--color-accent-green)',
+                                color: '#050709',
+                                padding: '1rem',
+                                borderRadius: '4px',
+                                fontWeight: 700,
+                                fontSize: '1rem'
+                            }}
+                        >
+                            Save
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
