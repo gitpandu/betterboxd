@@ -23,6 +23,7 @@ const createTableSQL = `
     posterPath TEXT NOT NULL,
     releaseDate TEXT,
     director TEXT,
+    cast TEXT,
     rating REAL NOT NULL,
     liked INTEGER NOT NULL,
     reviewText TEXT NOT NULL,
@@ -37,11 +38,22 @@ db.exec(createTableSQL);
 // Migration: Add 'deleted' column if it doesn't exist (for existing databases)
 try {
   const tableInfo = db.prepare("PRAGMA table_info(reviews)").all();
+
+  // Migration for 'deleted' column
   const hasDeletedColumn = tableInfo.some(col => col.name === 'deleted');
   if (!hasDeletedColumn) {
     db.exec('ALTER TABLE reviews ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0');
     console.log('[Database] Migration: Added "deleted" column to reviews table');
   }
+
+  // Migration for 'cast' column
+  const hasCastColumn = tableInfo.some(col => col.name === 'cast');
+  if (!hasCastColumn) {
+    db.exec('ALTER TABLE reviews ADD COLUMN cast TEXT');
+    console.log('[Database] Migration: Added "cast" column to reviews table');
+  }
+
+  // voteAverage migration removed as feature is reverted
 } catch (err) {
   console.error('[Database] Migration error:', err);
 }
@@ -58,8 +70,8 @@ export const statements = {
   getDeleted: db.prepare('SELECT * FROM reviews WHERE deleted = 1 ORDER BY createdAt DESC'),
 
   insert: db.prepare(`
-    INSERT INTO reviews (id, movieId, movieTitle, posterPath, releaseDate, director, rating, liked, reviewText, watchedDate, createdAt, deleted)
-    VALUES (@id, @movieId, @movieTitle, @posterPath, @releaseDate, @director, @rating, @liked, @reviewText, @watchedDate, @createdAt, 0)
+    INSERT INTO reviews (id, movieId, movieTitle, posterPath, releaseDate, director, cast, rating, liked, reviewText, watchedDate, createdAt, deleted)
+    VALUES (@id, @movieId, @movieTitle, @posterPath, @releaseDate, @director, @cast, @rating, @liked, @reviewText, @watchedDate, @createdAt, 0)
   `),
 
   update: db.prepare(`
@@ -69,6 +81,7 @@ export const statements = {
         posterPath = @posterPath,
         releaseDate = @releaseDate,
         director = @director,
+        cast = @cast,
         rating = @rating,
         liked = @liked,
         reviewText = @reviewText,

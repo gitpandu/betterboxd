@@ -1,18 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-export interface Review {
-    id: string;
-    movieId: number;
-    movieTitle: string;
-    posterPath: string;
-    releaseDate?: string;
-    director?: string;
-    rating: number;
-    liked: boolean;
-    reviewText: string;
-    watchedDate: string;
-    createdAt: number;
-}
+import type { Review } from '../types';
 
 // Fetch all reviews
 export async function getAllReviews(): Promise<Review[]> {

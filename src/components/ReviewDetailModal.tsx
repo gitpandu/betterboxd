@@ -1,4 +1,4 @@
-import { X, Star, Heart, Edit2, Calendar, Trash2 } from 'lucide-react';
+import { X, Star, Heart, Edit2, Calendar, Trash2, Eye } from 'lucide-react';
 import type { Review } from '../types';
 
 interface ReviewDetailModalProps {
@@ -46,9 +46,9 @@ export default function ReviewDetailModal({ isOpen, onClose, onEdit, onDelete, r
             <div style={{
                 background: 'var(--color-bg)',
                 width: '100%',
-                maxWidth: '500px',
-                maxHeight: '90vh',
-                borderRadius: 'var(--border-radius)',
+                maxWidth: '600px',
+                height: '100dvh',
+                borderRadius: '0',
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
@@ -145,7 +145,14 @@ export default function ReviewDetailModal({ isOpen, onClose, onEdit, onDelete, r
                                         </>
                                     )}
                                 </div>
-                                <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>
+                                {review.cast && (
+                                    <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+                                        Cast: {review.cast}
+                                    </div>
+                                )}
+
+                                <div style={{ fontSize: '0.9rem', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                                    <Eye size={16} />
                                     Watched {new Date(review.watchedDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
                                 </div>
                             </div>

@@ -46,14 +46,10 @@ export default function Diary() {
     };
 
     // Request delete confirmation
+    // Request delete confirmation
     const handleRequestDelete = (id: string) => {
         console.log(`[Diary] Delete requested for id: ${id}`);
-        // Close any open modals first
-        setIsModalOpen(false);
-        setIsViewModalOpen(false);
-        setEditingReview(null);
-        setViewingReview(null);
-        // Open confirmation dialog
+        // Open confirmation dialog without closing other modals
         setReviewToDelete(id);
         setIsConfirmOpen(true);
     };
@@ -68,6 +64,12 @@ export default function Diary() {
         try {
             await deleteReview(reviewToDelete);
             console.log(`[Diary] Delete operation completed for id: ${reviewToDelete}`);
+
+            // Close other modals now that delete is confirmed
+            setIsModalOpen(false);
+            setIsViewModalOpen(false);
+            setEditingReview(null);
+            setViewingReview(null);
         } catch (err) {
             console.error(`[Diary] Delete operation failed for id: ${reviewToDelete}:`, err);
             alert('Failed to delete review. Please try again.');

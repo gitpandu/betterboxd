@@ -58,7 +58,7 @@ app.get('/api/reviews/:id', (req, res) => {
 // Create new review
 app.post('/api/reviews', (req, res) => {
     try {
-        const { movieId, movieTitle, posterPath, releaseDate, director, rating, liked, reviewText, watchedDate } = req.body;
+        const { movieId, movieTitle, posterPath, releaseDate, director, cast, rating, liked, reviewText, watchedDate } = req.body;
 
         // Validation
         if (!movieId || !movieTitle || !posterPath || rating === undefined || liked === undefined || !reviewText || !watchedDate) {
@@ -72,6 +72,7 @@ app.post('/api/reviews', (req, res) => {
             posterPath,
             releaseDate: releaseDate || null,
             director: director || null,
+            cast: cast || null,
             rating,
             liked: liked ? 1 : 0, // Convert boolean to integer
             reviewText,
@@ -93,7 +94,7 @@ app.post('/api/reviews', (req, res) => {
 app.put('/api/reviews/:id', (req, res) => {
     try {
         const { id } = req.params;
-        const { movieId, movieTitle, posterPath, releaseDate, director, rating, liked, reviewText, watchedDate } = req.body;
+        const { movieId, movieTitle, posterPath, releaseDate, director, cast, rating, liked, reviewText, watchedDate } = req.body;
 
         // Check if review exists
         const existing = statements.getById.get(id);
@@ -108,6 +109,7 @@ app.put('/api/reviews/:id', (req, res) => {
             posterPath: posterPath !== undefined ? posterPath : existing.posterPath,
             releaseDate: releaseDate !== undefined ? releaseDate : existing.releaseDate,
             director: director !== undefined ? director : existing.director,
+            cast: cast !== undefined ? cast : existing.cast,
             rating: rating !== undefined ? rating : existing.rating,
             liked: liked !== undefined ? (liked ? 1 : 0) : existing.liked,
             reviewText: reviewText !== undefined ? reviewText : existing.reviewText,

@@ -33,23 +33,30 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
     }
 };
 
-export const getMovieDirector = async (movieId: number): Promise<string> => {
-    if (!API_KEY) return '';
+export const getMovieCredits = async (movieId: number): Promise<{ director: string, cast: string }> => {
+    if (!API_KEY) return { director: '', cast: '' };
 
     try {
         const response = await fetch(
             `${BASE_URL}/movie/${movieId}/credits?api_key=${API_KEY}`
         );
 
-        if (!response.ok) return '';
+        if (!response.ok) return { director: '', cast: '' };
 
         const data = await response.json();
-        const directorEntry = data.crew.find((member: any) => member.job === 'Director');
 
-        return directorEntry ? directorEntry.name : '';
+        const directorEntry = data.crew.find((member: any) => member.job === 'Director');
+        const director = directorEntry ? directorEntry.name : '';
+
+        const cast = data.cast
+            .slice(0, 5)
+            .map((member: any) => member.name)
+            .join(', ');
+
+        return { director, cast };
     } catch (error) {
-        console.error("Error fetching director:", error);
-        return '';
+        console.error("Error fetching credits:", error);
+        return { director: '', cast: '' };
     }
 };
 
